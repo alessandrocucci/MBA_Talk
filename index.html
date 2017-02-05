@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>PyRE - Market Basket Analysis</title>
+
+		<meta name="description" content="Building a Rest API using Flask and SQLAlchemy">
+		<meta name="author" content="Alessandro Cucci">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/moon.css" id="theme">
+        <link rel="stylesheet" href="plugin/fullscreen/fullscreen.css">
+
+		<!-- Code syntax highlighting - also available: visualstudio.css & zenburn.css -->
+		<link rel="stylesheet" href="lib/css/darcula.css">
+
+		<!-- Icons -->
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal moon">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section data-background-image="assets/background.jpg">
+					<div class="accent">
+						<h1>Python MBA</h1>
+						<h2>Market Basket Analysis</h2>
+					</div>
+					<p>Alessandro Cucci<br />Python Lead @ Energee3 srl</p>
+
+					<aside class="notes">
+						Hi, I'm a Speaker Note. You can open the Speaker View by hitting [S] on your keyboard.
+					</aside>
+				</section>
+
+				<section data-background-image="assets/background.jpg">
+					<div class="accent">
+						<h3>"Market Basket Analysis is a modelling technique based upon the theory that
+							if you buy a certain group of items, you are more (or less)
+							likely to buy another group of items."</h3>
+					</div>
+				</section>
+
+				<section data-background-image="assets/background.jpg">
+					<div class="accent">
+						<h1>Possible applications:</h1>
+					</div>
+				</section>
+
+				<section data-background-image="assets/grocerylayout.jpg" data-transition="fade">
+					<div class="accent textbox">
+						<h1>Store layout</h1>
+						<h2>put products that co-occur together close to one another, to improve the customer shopping experience</h2>
+					</div>
+				</section>
+
+				<section data-background-image="assets/marketing.jpg" data-transition="fade">
+					<div class="accent textbox">
+						<h1>Marketing</h1>
+						<h2>target customers who buy pecorino with offers on jowl bacon, to encourage them to spend more</h2>
+					</div>
+				</section>
+
+				<section data-background-image="assets/background.jpg" data-transition="fade">
+					<div class="accent">
+						<h2>Others</h2>
+						<h4>Drive recommendation engines</h4>
+						<img src="assets/chart.png" height="500"/>
+					</div>
+				</section>
+
+				<section data-background-image="assets/background.jpg" data-transition="fade">
+					<div class="accent">
+						<h2>Others</h2>
+						<h4>Emailing customers who bought specific products with other products that are likely to be interesting to them</h4>
+						<img src="assets/amazon.png"/>
+					</div>
+				</section>
+
+				<section data-background-image="assets/background.jpg">
+					<div class="accent">
+						<h3>Question: How do we uncover how items are associated to each other?</h3>
+						<h1 class="fragment fade-in">Association Rules Analysis</h1>
+					</div>
+				</section>
+
+				<section data-background-image="assets/background.jpg">
+					<div class="accent">
+						<h1>FIRST: We need lots of DATA!</h1>
+						<h3>Groceries Data Set:</h3>
+						<h4>http://www.salemmarafi.com/wp-content/uploads/2014/03/groceries.csv</h4>
+					</div>
+				</section>
+
+				<section data-background-image="assets/background.jpg">
+					<div class="accent">
+						<h3>groceries.csv</h3>
+						<pre><code>
+	tropical fruit,other vegetables,white bread,bottled water,chocolate
+	citrus fruit,tropical fruit,milk,butter,curd,yogurt,flour,bottled water
+	beef
+	frankfurter,rolls/buns,soda
+	chicken,tropical fruit
+	butter,sugar,fruit/vegetable juice,newspapers
+	fruit/vegetable juice
+	packaged fruit/vegetables
+	chocolate
+	specialty bar
+	other vegetables
+	butter milk,pastry
+	milk
+	tropical fruit,cream cheese ,processed cheese,detergent,newspapers
+						</code></pre>
+					</div>
+				</section>
+
+				<section data-background-image="assets/background.jpg">
+					<div class="accent">
+						<pre><code>
+class DataSet(object):
+    def __init__(self, file):
+        self.file = file
+        self.loaded = False
+        self.unique_items = set()
+        self.transactions = []
+
+    def read_file(self):
+        with open(self.file) as f:
+            self.transactions = [[item for item in transaction.split(',')]
+                            for transaction in f.read().splitlines()]
+            self.unique_items = set(el for transaction in self.transactions
+                            for el in transaction)
+            self.loaded = True
+
+    def __str__(self):
+        if not self.loaded:
+            self.read_file()
+        return "Dataset '{0}': {1} transactions, {2} unique items".format(
+                    self.file,
+                    len(self.transactions),
+                    len(self.unique_items)
+        )
+						</code></pre>
+					</div>
+				</section>
+
+				<section data-background-image="assets/background.jpg">
+					<div class="accent">
+						<h2>Groceries Data Set</h2>
+						<pre><code>
+>>> from dataset import DataSet
+>>> ds = DataSet('data/groceries.csv')
+
+>>> print(str(ds))
+"Dataset 'data/groceries.csv': 9835 transactions, 169 unique items"
+						</code></pre>
+					</div>
+				</section>
+
+                <section data-background-image="assets/background.jpg">
+                    <h1>THANK YOU!</h1>
+                    <br />
+                    <pre><code>
+{
+    'slides': 'www.alessandrocucci.it/pyre/mba',
+    'code': 'https://goo.gl/4UOqEr'
+}
+                    </code></pre>
+                </section>
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+		<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+		<script src="js/mba.js"></script>
+	</body>
+</html>
