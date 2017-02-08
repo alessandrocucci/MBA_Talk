@@ -181,6 +181,115 @@ class DataSet(object):
 				</section>
 
                 <section data-background-image="assets/background.jpg">
+					<div class="accent">
+						<h2>Common ways to measure association:</h2>
+						<ol>
+							<li><h3>SUPPORT</h3></li>
+                            <li><h3>CONFIDENCE</h3></li>
+                            <li><h3>LIFT</h3></li>
+						</ol>
+					</div>
+				</section>
+
+				<section data-background-image="assets/background.jpg">
+					<div class="accent">
+						<h2>SUPPORT</h2>
+						<h3>how popular an itemset is</h3>
+
+						<pre><code>
+def support(itemset, dataset):
+    n_transactions = len(t for t in dataset if all(i in t for i in itemset))
+    all_transactions = len(dataset)
+
+	return n_transactions / all_transactions
+						</code></pre>
+
+					</div>
+				</section>
+
+                <section data-background-image="assets/background.jpg">
+                        <div class="left-half">
+						    <img src="assets/transactions.png" />
+                        </div>
+                        <div class="right-half">
+                            <h3>Support of <br>set([apple, beer])</h3>
+                            <h2>3/8 = 37.5%</h2>
+                        </div>
+				</section>
+
+                <section data-background-image="assets/background.jpg">
+					<div class="accent">
+                        <h2>CONFIDENCE </h2>
+                        <h3>how likely item Y is purchased when item X is purchased</h3>
+
+						<pre><code>
+confidence = support([X, Y], dataset) / support([X], dataset)
+						</code></pre>
+
+					</div>
+				</section>
+
+                <section data-background-image="assets/background.jpg">
+                        <div class="left-half">
+						    <img src="assets/transactions.png" />
+                        </div>
+                        <div class="right-half">
+                            <h3>Confidence of <br>{apple -> beer}</h3>
+                            <h2>(3/8)/(4/8) = 75%</h2>
+                        </div>
+				</section>
+
+                <section data-background-image="assets/background.jpg">
+					<div class="accent">
+
+						<h3>WARNING: it might misrepresent the importance of an association.
+                            This is because it only accounts for how popular apples are, <b>but not beers</b>.
+                            If beers are also very popular in general,
+                            there will be a higher chance that a transaction containing apples
+                            will also contain beers, thus inflating the confidence measure.</h3>
+
+					</div>
+				</section>
+
+                <section data-background-image="assets/background.jpg">
+					<div class="accent">
+                        <h2>LIFT</h2>
+                        <h3>how likely item Y is purchased when item X is purchased, while controlling for how popular item Y is</h3>
+
+						<pre><code>
+support_X_Y = support([X, Y], dataset)
+support_X = support([X], dataset)
+support_Y = support([Y], dataset)
+
+lift = support_X_Y / (support_X * support_Y)
+						</code></pre>
+
+					</div>
+				</section>
+
+                 <section data-background-image="assets/background.jpg">
+                        <div class="left-half">
+						    <img src="assets/transactions.png" />
+                        </div>
+                        <div class="right-half">
+                            <h3>Lift of <br>{apple -> beer}</h3>
+                            <h2>(3/8)/(4/8 * 6/8) = 1</h2>
+                        </div>
+				</section>
+
+                <section data-background-image="assets/background.jpg">
+					<div class="accent">
+                        <h2>LIFT</h2>
+                        <ul>
+                            <li>lift = 1 (no association between items)</li>
+                            <li>lift > 1 (Y is likely to be bought if item X is bought)</li>
+                            <li>lift < 1 (Y is unlikely to be bought if item X is bought)</li>
+                        </ul>
+
+					</div>
+				</section>
+
+                <section data-background-image="assets/background.jpg">
                     <h1>THANK YOU!</h1>
                     <br />
                     <pre><code>
